@@ -1,6 +1,6 @@
-# Replays Backend
+# Frameworks Backend
 
-Backend de replays de batalhas entre gladiadores, construído em **NestJS** com arquitetura modular, **Prisma ORM** sobre **PostgreSQL**, testes unitários e funcionais com **Jest** e **Supertest**, e integração com um microsserviço externo de storage para recuperação do histórico de replays (JSONs).
+Backend de batalhas entre gladiadores, construído em **NestJS** com arquitetura modular, **Prisma ORM** sobre **PostgreSQL**, testes unitários e funcionais com **Jest** e **Supertest**.
 
 ## Stack
 
