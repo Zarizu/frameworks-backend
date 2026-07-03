@@ -89,7 +89,7 @@ A aplicação sobe por padrão em `http://localhost:3000`.
 
 ## Testes
 
-### Testes unitários
+### Testes unitários (WIP)
 
 Testam services e controllers isoladamente, com o `PrismaService` e o `StorageService` mockados (nenhuma conexão real com banco ou rede).
 
@@ -98,7 +98,7 @@ npm run test
 npm run test:cov   # com relatório de cobertura
 ```
 
-### Testes funcionais (e2e)
+### Testes funcionais (e2e) (WIP)
 
 Sobem a aplicação Nest completa e testam via HTTP real (Supertest), contra o banco de teste isolado (`replays_db_test`, porta `5433`). O único ponto mockado é o `StorageService` (integração externa).
 
@@ -117,14 +117,14 @@ npm run test:e2e
 ```
 src/
 ├── app.module.ts
+├── app.controller.ts
 ├── main.ts
 ├── prisma/              # PrismaModule (global) e PrismaService
 ├── users/               # CRUD de usuários
 ├── gladiators/          # CRUD de gladiadores
-├── battles/             # CRUD de batalhas + participantes (0-5 gladiadores)
-└── storage/             # cliente HTTP para o microsserviço de storage (replays)
+└── battles/             # CRUD de batalhas + participantes (0-5 gladiadores)
 test/
-└── *.e2e-spec.ts        # testes funcionais (Supertest)
+└── rest/                # Pasta com exemplos de request (Rest Client VSCode Extension)
 prisma/
 ├── schema.prisma
 └── migrations/
