@@ -1,0 +1,984 @@
+@host = http://localhost:3000
+
+###############################################
+# USERS
+###############################################
+
+### Listar usuários
+GET {{host}}/users
+
+###
+
+### Criar usuário
+# @name createUser
+POST {{host}}/users
+Content-Type: application/json
+
+{
+    "username": "spartacus",
+    "email": "spartacus@arena.com"
+}
+
+###
+
+@userId = {{createUser.response.body.$.id}}
+
+### Buscar usuário criado
+GET {{host}}/users/{{userId}}
+
+###
+
+### Atualizar usuário
+PATCH {{host}}/users/{{userId}}
+Content-Type: application/json
+
+{
+    "username": "spartacus-atualizado"
+}
+
+###
+
+### Criar usuário - erro de validação (email inválido)
+POST {{host}}/users
+Content-Type: application/json
+
+{
+    "username": "invalido",
+    "email": "nao-e-um-email"
+}
+
+###
+
+### Criar usuário - erro de validação (username curto demais, Length min é 3)
+POST {{host}}/users
+Content-Type: application/json
+
+{
+    "username": "ab",
+    "email": "curto@arena.com"
+}
+
+###
+
+### Criar usuário - erro de validação (campos ausentes)
+POST {{host}}/users
+Content-Type: application/json
+
+{}
+
+###
+
+### Criar segundo usuário - erro de email duplicado (409, se o PrismaExceptionFilter estiver ativo)
+POST {{host}}/users
+Content-Type: application/json
+
+{
+    "username": "outro",
+    "email": "spartacus@arena.com"
+}
+
+###
+
+### Buscar usuário inexistente (404)
+GET {{host}}/users/999999
+
+###
+
+### Atualizar usuário inexistente (404)
+PATCH {{host}}/users/999999
+Content-Type: application/json
+
+{
+    "username": "fantasma"
+}
+
+###
+
+
+###############################################
+# GLADIATORS
+###############################################
+
+### Listar gladiadores
+GET {{host}}/gladiators
+
+###
+
+### Criar gladiador 1, vinculado ao usuário criado
+# @name createGladiator1
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Maximus"
+}
+
+###
+
+@gladiator1Id = {{createGladiator1.response.body.$.id}}
+
+### Criar gladiador 2
+# @name createGladiator2
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Commodus"
+}
+
+###
+
+@gladiator2Id = {{createGladiator2.response.body.$.id}}
+
+### Criar gladiador 3
+# @name createGladiator3
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Crixus"
+}
+
+###
+
+@gladiator3Id = {{createGladiator3.response.body.$.id}}
+
+### Criar gladiador 4
+# @name createGladiator4
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Spiculus"
+}
+
+###
+
+@gladiator4Id = {{createGladiator4.response.body.$.id}}
+
+### Criar gladiador 5
+# @name createGladiator5
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Flamma"
+}
+
+###
+
+@gladiator5Id = {{createGladiator5.response.body.$.id}}
+
+### Criar gladiador 6 (extra, usado no teste de limite de 5 contestants)
+# @name createGladiator6
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Tetraites"
+}
+
+###
+
+@gladiator6Id = {{createGladiator6.response.body.$.id}}
+
+### Buscar gladiador criado
+GET {{host}}/gladiators/{{gladiator1Id}}
+
+###
+
+### Atualizar gladiador
+PATCH {{host}}/gladiators/{{gladiator1Id}}
+Content-Type: application/json
+
+{
+    "name": "Maximus Decimus Meridius"
+}
+
+###
+
+### Criar gladiador - erro (userId inexistente, viola FK)
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": 999999,
+    "name": "Fantasma"
+}
+
+###
+
+### Criar gladiador - erro de validação (nome ausente)
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}}
+}
+
+###
+
+### Criar gladiador - erro de validação (nome curto demais, Length min é 2)
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "A"
+}
+
+###
+
+### Buscar gladiador inexistente (404)
+GET {{host}}/gladiators/999999
+
+###
+
+
+###############################################
+# BATTLES
+###############################################
+
+### Listar batalhas
+GET {{host}}/battles
+
+###
+
+### Criar batalha (nasce sem contestants)
+# @name createBattle
+POST {{host}}/battles
+Content-Type: application/json
+
+{
+    "name": "Arena Suprema",
+    "totalSteps": 2500,
+    "fileId": "arena-suprema.json"
+}
+
+###
+
+@battleId = {{createBattle.response.body.$.id}}
+
+### Buscar batalha criada
+GET {{host}}/battles/{{battleId}}
+
+###
+
+### Atualizar batalha (nome)
+PATCH {{host}}/battles/{{battleId}}
+Content-Type: application/json
+
+{
+    "name": "Arena Suprema Atualizada"
+}
+
+###
+
+### Criar batalha - erro de validação (fileId ausente)
+POST {{host}}/battles
+Content-Type: application/json
+
+{
+    "name": "Sem Replay",
+    "totalSteps": 500
+}
+
+###
+
+### Criar batalha - erro de validação (totalSteps inválido, Min é 1)
+POST {{host}}/battles
+Content-Type: application/json
+
+{
+    "name": "Passos Negativos",
+    "totalSteps": -10,
+    "fileId": "invalido.json"
+}
+
+###
+
+### Buscar batalha inexistente (404)
+GET {{host}}/battles/999999
+
+###
+
+### Atualizar batalha inexistente (404)
+PATCH {{host}}/battles/999999
+Content-Type: application/json
+
+{
+    "name": "Não existe"
+}
+
+###
+
+
+###############################################
+# BATTLE CONTESTANTS
+###############################################
+
+### Listar contestants da batalha (vazio no início)
+GET {{host}}/battles/{{battleId}}/contestants
+
+###
+
+### Adicionar gladiador 1 como contestant
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator1Id}}
+}
+
+###
+
+### Adicionar gladiador 2
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator2Id}}
+}
+
+###
+
+### Adicionar gladiador 3
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator3Id}}
+}
+
+###
+
+### Adicionar gladiador 4
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator4Id}}
+}
+
+###
+
+### Adicionar gladiador 5 (atinge o limite máximo)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator5Id}}
+}
+
+###
+
+### Listar contestants (deve retornar os 5 adicionados)
+GET {{host}}/battles/{{battleId}}/contestants
+
+###
+
+### Adicionar gladiador 6 - erro esperado (excede o limite de 5 contestants)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator6Id}}
+}
+
+###
+
+### Adicionar gladiador 1 de novo - erro esperado (já é contestant dessa batalha)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator1Id}}
+}
+
+###
+
+### Adicionar contestant - erro (gladiatorId inexistente)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": 999999
+}
+
+###
+
+### Adicionar contestant - erro (battleId inexistente na URL)
+POST {{host}}/battles/999999/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator6Id}}
+}
+
+###
+
+### Remover gladiador 5 como contestant
+DELETE {{host}}/battles/{{battleId}}/contestants/{{gladiator5Id}}
+
+###
+
+### Confirma que sobraram 4 contestants
+GET {{host}}/battles/{{battleId}}/contestants
+
+###
+
+### Adicionar gladiador 6 agora funciona (abriu vaga após a remoção)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator6Id}}
+}
+
+###
+
+### Remover contestant - erro (gladiador não é contestant dessa batalha)
+DELETE {{host}}/battles/{{battleId}}/contestants/999999
+
+###
+
+
+###############################################
+# LIMPEZA (ordem importa por causa das FKs)
+###############################################
+
+### Remover batalha
+DELETE {{host}}/battles/{{battleId}}
+
+###
+
+### Remover gladiadores
+DELETE {{host}}/gladiators/{{gladiator1Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator2Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator3Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator4Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator5Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator6Id}}
+
+###
+
+### Remover usuário
+DELETE {{host}}/users/{{userId}}
+
+###
+
+### Remover batalha já removida - erro esperado (404)
+DELETE {{host}}/battles/{{battleId}}
+@host = http://localhost:3000
+
+###############################################
+# USERS
+###############################################
+
+### Listar usuários
+GET {{host}}/users
+
+###
+
+### Criar usuário
+# @name createUser
+POST {{host}}/users
+Content-Type: application/json
+
+{
+    "username": "spartacus",
+    "email": "spartacus@arena.com"
+}
+
+###
+
+@userId = {{createUser.response.body.$.id}}
+
+### Buscar usuário criado
+GET {{host}}/users/{{userId}}
+
+###
+
+### Atualizar usuário
+PATCH {{host}}/users/{{userId}}
+Content-Type: application/json
+
+{
+    "username": "spartacus-atualizado"
+}
+
+###
+
+### Criar usuário - erro de validação (email inválido)
+POST {{host}}/users
+Content-Type: application/json
+
+{
+    "username": "invalido",
+    "email": "nao-e-um-email"
+}
+
+###
+
+### Criar usuário - erro de validação (username curto demais, Length min é 3)
+POST {{host}}/users
+Content-Type: application/json
+
+{
+    "username": "ab",
+    "email": "curto@arena.com"
+}
+
+###
+
+### Criar usuário - erro de validação (campos ausentes)
+POST {{host}}/users
+Content-Type: application/json
+
+{}
+
+###
+
+### Criar segundo usuário - erro de email duplicado (409, se o PrismaExceptionFilter estiver ativo)
+POST {{host}}/users
+Content-Type: application/json
+
+{
+    "username": "outro",
+    "email": "spartacus@arena.com"
+}
+
+###
+
+### Buscar usuário inexistente (404)
+GET {{host}}/users/999999
+
+###
+
+### Atualizar usuário inexistente (404)
+PATCH {{host}}/users/999999
+Content-Type: application/json
+
+{
+    "username": "fantasma"
+}
+
+###
+
+
+###############################################
+# GLADIATORS
+###############################################
+
+### Listar gladiadores
+GET {{host}}/gladiators
+
+###
+
+### Criar gladiador 1, vinculado ao usuário criado
+# @name createGladiator1
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Maximus"
+}
+
+###
+
+@gladiator1Id = {{createGladiator1.response.body.$.id}}
+
+### Criar gladiador 2
+# @name createGladiator2
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Commodus"
+}
+
+###
+
+@gladiator2Id = {{createGladiator2.response.body.$.id}}
+
+### Criar gladiador 3
+# @name createGladiator3
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Crixus"
+}
+
+###
+
+@gladiator3Id = {{createGladiator3.response.body.$.id}}
+
+### Criar gladiador 4
+# @name createGladiator4
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Spiculus"
+}
+
+###
+
+@gladiator4Id = {{createGladiator4.response.body.$.id}}
+
+### Criar gladiador 5
+# @name createGladiator5
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Flamma"
+}
+
+###
+
+@gladiator5Id = {{createGladiator5.response.body.$.id}}
+
+### Criar gladiador 6 (extra, usado no teste de limite de 5 contestants)
+# @name createGladiator6
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "Tetraites"
+}
+
+###
+
+@gladiator6Id = {{createGladiator6.response.body.$.id}}
+
+### Buscar gladiador criado
+GET {{host}}/gladiators/{{gladiator1Id}}
+
+###
+
+### Atualizar gladiador
+PATCH {{host}}/gladiators/{{gladiator1Id}}
+Content-Type: application/json
+
+{
+    "name": "Maximus Decimus Meridius"
+}
+
+###
+
+### Criar gladiador - erro (userId inexistente, viola FK)
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": 999999,
+    "name": "Fantasma"
+}
+
+###
+
+### Criar gladiador - erro de validação (nome ausente)
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}}
+}
+
+###
+
+### Criar gladiador - erro de validação (nome curto demais, Length min é 2)
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": {{userId}},
+    "name": "A"
+}
+
+###
+
+### Buscar gladiador inexistente (404)
+GET {{host}}/gladiators/999999
+
+###
+
+
+###############################################
+# BATTLES
+###############################################
+
+### Listar batalhas
+GET {{host}}/battles
+
+###
+
+### Criar batalha (nasce sem contestants)
+# @name createBattle
+POST {{host}}/battles
+Content-Type: application/json
+
+{
+    "name": "Arena Suprema",
+    "totalSteps": 2500,
+    "fileId": "arena-suprema.json"
+}
+
+###
+
+@battleId = {{createBattle.response.body.$.id}}
+
+### Buscar batalha criada
+GET {{host}}/battles/{{battleId}}
+
+###
+
+### Atualizar batalha (nome)
+PATCH {{host}}/battles/{{battleId}}
+Content-Type: application/json
+
+{
+    "name": "Arena Suprema Atualizada"
+}
+
+###
+
+### Criar batalha - erro de validação (fileId ausente)
+POST {{host}}/battles
+Content-Type: application/json
+
+{
+    "name": "Sem Replay",
+    "totalSteps": 500
+}
+
+###
+
+### Criar batalha - erro de validação (totalSteps inválido, Min é 1)
+POST {{host}}/battles
+Content-Type: application/json
+
+{
+    "name": "Passos Negativos",
+    "totalSteps": -10,
+    "fileId": "invalido.json"
+}
+
+###
+
+### Buscar batalha inexistente (404)
+GET {{host}}/battles/999999
+
+###
+
+### Atualizar batalha inexistente (404)
+PATCH {{host}}/battles/999999
+Content-Type: application/json
+
+{
+    "name": "Não existe"
+}
+
+###
+
+
+###############################################
+# BATTLE CONTESTANTS
+###############################################
+
+### Listar contestants da batalha (vazio no início)
+GET {{host}}/battles/{{battleId}}/contestants
+
+###
+
+### Adicionar gladiador 1 como contestant
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator1Id}}
+}
+
+###
+
+### Adicionar gladiador 2
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator2Id}}
+}
+
+###
+
+### Adicionar gladiador 3
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator3Id}}
+}
+
+###
+
+### Adicionar gladiador 4
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator4Id}}
+}
+
+###
+
+### Adicionar gladiador 5 (atinge o limite máximo)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator5Id}}
+}
+
+###
+
+### Listar contestants (deve retornar os 5 adicionados)
+GET {{host}}/battles/{{battleId}}/contestants
+
+###
+
+### Adicionar gladiador 6 - erro esperado (excede o limite de 5 contestants)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator6Id}}
+}
+
+###
+
+### Adicionar gladiador 1 de novo - erro esperado (já é contestant dessa batalha)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator1Id}}
+}
+
+###
+
+### Adicionar contestant - erro (gladiatorId inexistente)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": 999999
+}
+
+###
+
+### Adicionar contestant - erro (battleId inexistente na URL)
+POST {{host}}/battles/999999/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator6Id}}
+}
+
+###
+
+### Remover gladiador 5 como contestant
+DELETE {{host}}/battles/{{battleId}}/contestants/{{gladiator5Id}}
+
+###
+
+### Confirma que sobraram 4 contestants
+GET {{host}}/battles/{{battleId}}/contestants
+
+###
+
+### Adicionar gladiador 6 agora funciona (abriu vaga após a remoção)
+POST {{host}}/battles/{{battleId}}/contestants
+Content-Type: application/json
+
+{
+    "gladiatorId": {{gladiator6Id}}
+}
+
+###
+
+### Remover contestant - erro (gladiador não é contestant dessa batalha)
+DELETE {{host}}/battles/{{battleId}}/contestants/999999
+
+###
+
+
+###############################################
+# LIMPEZA (ordem importa por causa das FKs)
+###############################################
+
+### Remover batalha
+DELETE {{host}}/battles/{{battleId}}
+
+###
+
+### Remover gladiadores
+DELETE {{host}}/gladiators/{{gladiator1Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator2Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator3Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator4Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator5Id}}
+
+###
+
+DELETE {{host}}/gladiators/{{gladiator6Id}}
+
+###
+
+### Remover usuário
+DELETE {{host}}/users/{{userId}}
+
+###
+
+### Remover batalha já removida - erro esperado (404)
+DELETE {{host}}/battles/{{battleId}}
