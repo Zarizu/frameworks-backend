@@ -1,13 +1,51 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
+// schema.prisma
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id         Int         @id @default(autoincrement())
+  username   String
+  email      String      @unique
+  createdAt  DateTime    @default(now()) @map("created_at")
+  gladiators Gladiator[]
+
+  @@map("users")
+}
+
+model Gladiator {
+  id        Int                @id @default(autoincrement())
+  userId    Int                @map("user_id")
+  name      String
+  createdAt DateTime           @default(now()) @map("created_at")
+  user      User               @relation(fields: [userId], references: [id])
+  battles   BattleContestant[]
+
+  @@map("gladiators")
+}
+
+model Battle {
+  id          Int                @id @default(autoincrement())
+  name        String
+  totalSteps  Int                @map("total_steps")
+  fileId      String             @map("file_id")
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+  contestants BattleContestant[]
+
+  @@map("battles")
+}
+
+model BattleContestant {
+  battleId    Int       @map("battle_id")
+  gladiatorId Int       @map("gladiator_id")
+  battle      Battle    @relation(fields: [battleId], references: [id])
+  gladiator   Gladiator @relation(fields: [gladiatorId], references: [id])
+
+  @@id([battleId, gladiatorId])
+  @@map("battle_contestants")
 }

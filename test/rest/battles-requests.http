@@ -1,0 +1,36 @@
+@host = http://localhost:3000
+
+### Listar batalhas
+GET {{host}}/battles
+
+###
+
+### Buscar batalha
+GET {{host}}/battles/1
+
+###
+
+### Criar batalha
+POST {{host}}/battles
+Content-Type: application/json
+
+{
+    "name": "Arena Suprema",
+    "totalSteps": 2500,
+    "fileId": "arena-suprema.json"
+}
+
+###
+
+### Atualizar batalha
+PATCH {{host}}/battles/1
+Content-Type: application/json
+
+{
+    "name": "Arena Suprema Atualizada"
+}
+
+###
+
+### Remover batalha
+DELETE {{host}}/battles/1

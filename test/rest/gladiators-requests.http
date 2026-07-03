@@ -1,0 +1,35 @@
+@host = http://localhost:3000
+
+### Listar gladiadores
+GET {{host}}/gladiators
+
+###
+
+### Buscar gladiador
+GET {{host}}/gladiators/1
+
+###
+
+### Criar gladiador
+POST {{host}}/gladiators
+Content-Type: application/json
+
+{
+    "userId": 1,
+    "name": "Kratos"
+}
+
+###
+
+### Atualizar gladiador
+PATCH {{host}}/gladiators/1
+Content-Type: application/json
+
+{
+    "name": "Ghost of Sparta"
+}
+
+###
+
+### Remover gladiador
+DELETE {{host}}/gladiators/1
